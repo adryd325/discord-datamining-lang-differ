@@ -1,5 +1,5 @@
 {
-  "name": "discord-datamining-lang-differ",
+  "name": "@adryd325/discord-datamining-lang-differ",
   "version": "1.0.0",
   "description": "",
   "main": "differ.js",
@@ -20,5 +20,7 @@
     "url": "https://github.com/adryd325/discordDataminingLangDiffer/issues"
   },
   "homepage": "https://github.com/adryd325/discordDataminingLangDiffer#readme",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" }
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/" 
+  }
 }
