@@ -1,14 +1,20 @@
 # Discord-Datamining lang differ
 ### Does what it says it does, It diffs lang files.
-(Don't use this please, this is only public for the fact that it's required in a CI somewhere)
+(for your own sake, don't use this, this is only public for the fact that it's required in a CI somewhere)
 
-Usage:
+Install
+```sh
+npm install --save https://github.com/adryd325/discordDataminingLangDiffer.git
 ```
+
+Example
+```js
 const fs = require('fs');
-const differ = require('discord-datamining-lang-differ')
-const oldFile = fs.readFileSync(__dirname + '/oldFile.js', 'utf-8') 
+const differ = require('@adryd325/discord-datamining-lang-differ')
+const oldFile = fs.readFileSync(__dirname + '/oldFile.js', 'utf-8')
 const newFile = fs.readFileSync(__dirname + '/newFile.js', 'utf-8')
-differ('string1','string2')
+console.log(differ(oldFile,newFile))
 ```
 
 Returns an easy to read, markdown formatted diff of the changes to lang entries
+
