@@ -1,6 +1,6 @@
 {
   "name": "@adryd325/discord-datamining-lang-differ",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "differ.js",
   "scripts": {
@@ -21,6 +21,9 @@
   },
   "homepage": "https://github.com/adryd325/discordDataminingLangDiffer#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/" 
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "dependencies": {
+    "esprima": "^4.0.1"
   }
 }
