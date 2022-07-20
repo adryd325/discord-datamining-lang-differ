@@ -1,11 +1,13 @@
 // HOLY SHIT I HATE THIS
 
-const esprima = require("esprima");
+const espree = require("espree");
 module.exports = getLangStrings
 
 // I really really hate this, but this is much safer than regex+eval
 function getLangStrings(file) {
-  const webpackModules = esprima.parse(file).body[0].expression.arguments[0].elements;
+  const webpackModules = espree.parse(file, {
+    ecmaVersion: 2022,
+  }).body[0].expression.arguments[0].elements;
 
   const allStrings = {};
 
