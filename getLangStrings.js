@@ -1,43 +1,51 @@
 // HOLY SHIT I HATE THIS
 
 const espree = require("espree");
-module.exports = getLangStrings
+module.exports = getLangStrings;
 
 // I really really hate this, but this is much safer than regex+eval
 function getLangStrings(file) {
-  const webpackModules = espree.parse(file, {
+  const tree = espree.parse(file, {
     ecmaVersion: 2022,
-  }).body[0].expression.arguments[0].elements;
+  });
+
+  const webpackModules =
+    tree.body[0].expression.arguments[0].elements[1].properties;
 
   const allStrings = {};
 
-  webpackModules.forEach((webpackChunk) => {
-    webpackChunk?.properties?.forEach((webpackModule) => {
+  webpackModules.forEach((webpackModule) => {
+    let expression = webpackModule?.value?.body?.body?.[0]?.expression;
+    if (!expression) {
+      return;
+    }
+    if (
+     expression.right?.callee?.object
+        ?.name === "Object" &&
+     expression?.right?.callee?.property
+        ?.name === "freeze" &&
+     expression?.right?.arguments[0]
+    ) {
       if (
-        webpackModule?.value?.body?.body?.[1]?.expression?.right?.callee?.object?.name === "Object" &&
-        webpackModule?.value?.body?.body?.[1]?.expression?.right?.callee?.property?.name === "freeze" &&
-        webpackModule?.value?.body?.body?.[1]?.expression?.right?.arguments[0]
+        expression.right.arguments[0].properties.some(
+          (suspectedLangModule) => {
+            if (
+              suspectedLangModule.key.name === "DISCORD_NAME" ||
+              suspectedLangModule.key.name === "TEAL"
+            ) {
+              return true;
+            }
+          }
+        )
       ) {
-        if (
-          webpackModule.value.body.body[1].expression.right.arguments[0].properties.some(
-            (suspectedLangModule) => {
-              if (
-                suspectedLangModule.key.name === "DISCORD_NAME" ||
-                suspectedLangModule.key.name === "TEAL"
-              ) {
-                return true;
-              }
-            }
-          )
-        ) {
-          webpackModule.value.body.body[1].expression.right.arguments[0].properties.forEach(
-            (langEntry) => {
-              allStrings[langEntry.key.name] = langEntry.value.raw;
-            }
-          );
-        }
+        expression.right.arguments[0].properties.forEach(
+          (langEntry) => {
+            allStrings[langEntry.key.name] = langEntry.value.raw;
+          }
+        );
       }
-    });
+    }
   });
-  return allStrings
+
+  return allStrings;
 }
