@@ -1,6 +1,6 @@
 {
   "name": "@adryd325/discord-datamining-lang-differ",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
   "main": "differ.js",
   "scripts": {

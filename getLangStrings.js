@@ -14,37 +14,79 @@ function getLangStrings(file) {
 
   const allStrings = {};
 
-  webpackModules.forEach((webpackModule) => {
-    let expression = webpackModule?.value?.body?.body?.[0]?.expression;
+  function parseStrings(webpackModule) {
+    const expression = webpackModule?.value?.body?.body?.[2]?.expression;
     if (!expression) {
       return;
     }
+
     if (
-     expression.right?.callee?.object
-        ?.name === "Object" &&
-     expression?.right?.callee?.property
-        ?.name === "freeze" &&
-     expression?.right?.arguments[0]
+     expression.right?.callee?.object?.name === "Object" &&
+     expression.right?.callee?.property?.name === "freeze" &&
+     expression.right?.arguments?.[0].expressions?.[0]?.arguments?.[0]
     ) {
+      // parse frozen object
+      const properties =
+        expression.right.arguments[0].expressions[0].arguments[0].right.properties;
       if (
-        expression.right.arguments[0].properties.some(
+        properties.some(
           (suspectedLangModule) => {
-            if (
-              suspectedLangModule.key.name === "DISCORD_NAME" ||
-              suspectedLangModule.key.name === "TEAL"
-            ) {
+            if (suspectedLangModule.key.name === "DISCORD_DESC_SHORT") {
               return true;
             }
           }
         )
       ) {
-        expression.right.arguments[0].properties.forEach(
+        properties.forEach(
+          (langEntry) => {
+            allStrings[langEntry.key.name] = langEntry.value.raw;
+          }
+        );
+      }
+
+      // parse function call arguments
+      expression.right.arguments[0].expressions.forEach(
+        (callExpr) => {
+          if (callExpr.arguments?.[1] && callExpr.arguments?.[2])
+            allStrings[callExpr.arguments[1].value] = callExpr.arguments[2].raw;
+        }
+      );
+    }
+  }
+
+  function parseUntranslatedStrings(webpackModule) {
+    const expression = webpackModule?.value?.body?.body?.[0]?.expression;
+    if (!expression) {
+      return;
+    }
+
+    if (
+     expression.right?.callee?.object?.name === "Object" &&
+     expression.right?.callee?.property?.name === "freeze" &&
+     expression.right?.arguments[0]?.properties
+    ) {
+      const properties = expression.right.arguments[0].properties;
+      if (
+        properties.some(
+          (suspectedLangModule) => {
+            if (suspectedLangModule.key.name === "DISCORD_NAME") {
+              return true;
+            }
+          }
+        )
+      ) {
+        properties.forEach(
           (langEntry) => {
             allStrings[langEntry.key.name] = langEntry.value.raw;
           }
         );
       }
     }
+  }
+
+  webpackModules.forEach((webpackModule) => {
+    parseStrings(webpackModule);
+    parseUntranslatedStrings(webpackModule);
   });
 
   return allStrings;
