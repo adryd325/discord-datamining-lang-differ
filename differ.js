@@ -4,11 +4,10 @@
 
 // Alright, let's get started
 
-
-
 // this file is really cursed, though it's wayyy safer than regex and eval
 // or parsing from a regex
 const getLangStrings = require("./getLangStrings");
+const getLangEndpoints = require("./getLangEndpoints");
 
 // For example we grab these two files which have had lang changes between the two
 // const fs = require('fs');
@@ -17,27 +16,37 @@ const getLangStrings = require("./getLangStrings");
 // console.log(doWork(file1, file2));
 
 const formats = {
-  "codeblock": {
-    startString: "## Strings\n```diff",
+  codeblock: {
+    startString: {
+      strings: "## Strings\n```diff",
+      endpoints: "## Endpoints\n```diff",
+    },
     endString: "```",
     addedHeader: "\n# Added\n",
     updatedHeader: "\n# Updated\n",
     removedHeader: "\n# Removed\n",
     added: (diffedString) => `+ ${diffedString[0]}: ${diffedString[1]}\n`,
-    updated: (diffedString) => `- ${diffedString[0]}: ${diffedString[1]}\n+ ${diffedString[0]}: ${diffedString[2]}\n`,
+    updated: (diffedString) =>
+      `- ${diffedString[0]}: ${diffedString[1]}\n+ ${diffedString[0]}: ${diffedString[2]}\n`,
     removed: (diffedString) => `- ${diffedString[0]}: ${diffedString[1]}\n`,
   },
-  "inline": {
-    startString: "## Strings\n",
+  inline: {
+    startString: {
+      strings: "## Strings\n```diff",
+      endpoints: "## Endpoints\n```diff",
+    },
     endString: "",
     addedHeader: "### Added\n",
     updatedHeader: "### Updated\n",
     removedHeader: "### Removed\n",
-    added: (diffedString) => ` - \`${diffedString[0]}\`: \`${diffedString[1]}\`\n`,
-    updated: (diffedString) => ` - \`${diffedString[0]}\`: \`${diffedString[1]}\` -> \`${diffedString[2]}\`\n`,
-    removed: (diffedString) => ` - \`${diffedString[0]}\`: \`${diffedString[1]}\`\n`,
+    added: (diffedString) =>
+      ` - \`${diffedString[0]}\`: \`${diffedString[1]}\`\n`,
+    updated: (diffedString) =>
+      ` - \`${diffedString[0]}\`: \`${diffedString[1]}\` -> \`${diffedString[2]}\`\n`,
+    removed: (diffedString) =>
+      ` - \`${diffedString[0]}\`: \`${diffedString[1]}\`\n`,
   },
-}
+};
 
 let FORMAT;
 
@@ -48,43 +57,72 @@ let FORMAT;
  * @param {('codeblock'|'inline')} format - Which format to use when building the strings
  */
 function doWork(file1, file2, format) {
-  const langFiles = [getLangStrings(file1), getLangStrings(file2)];
-  const { addedStrings, updatedStrings, removedStrings } = diff(langFiles);
+  const langFilesStrings = [getLangStrings(file1), getLangStrings(file2)];
+  const langFilesEndpoints = [getLangEndpoints(file1), getLangEndpoints(file2)];
+  const { addedStrings, updatedStrings, removedStrings } =
+    diff(langFilesStrings);
+  const {
+    addedStrings: addedEndpoints,
+    updatedStrings: updatedEndpoints,
+    removedStrings: removedEndpoints,
+  } = diff(langFilesEndpoints);
   FORMAT = format;
-  const builtString = buildString(addedStrings, updatedStrings, removedStrings);
-  return builtString;
+  const builtString = buildString(
+    "strings",
+    addedStrings,
+    updatedStrings,
+    removedStrings
+  );
+  const builtEndpoint = buildString(
+    "endpoints",
+    addedEndpoints,
+    updatedEndpoints,
+    removedEndpoints
+  );
+
+  let result = "";
+
+  if (builtString) {
+    result += builtString;
+  }
+
+  if (builtEndpoint) {
+    result += builtString ? "\n" + builtEndpoint : builtEndpoint;
+  }
+
+  return result;
 }
 
 function diff(strings) {
   const removedStrings = [];
   const updatedStrings = [];
-  const addedStrings = []
+  const addedStrings = [];
   for (const i of Object.keys(strings[0])) {
     if (strings[1][i]) {
       if (strings[0][i] !== strings[1][i]) {
         updatedStrings.push([i, strings[0][i], strings[1][i]]);
       }
     } else {
-      removedStrings.push([i, strings[0][i]])
+      removedStrings.push([i, strings[0][i]]);
     }
   }
   for (const i of Object.keys(strings[1])) {
     if (!strings[0][i]) {
-      addedStrings.push([i, strings[1][i]])
+      addedStrings.push([i, strings[1][i]]);
     }
   }
   return {
     addedStrings,
     updatedStrings,
-    removedStrings
-  }
+    removedStrings,
+  };
 }
 
-function buildString(addedStrings, updatedStrings, removedStrings) {
+function buildString(type, addedStrings, updatedStrings, removedStrings) {
   let builtString = "";
   // if any of the following have data, we build a string
   if (addedStrings[0] || updatedStrings[0] || removedStrings[0]) {
-    builtString += formats[FORMAT].startString;
+    builtString += formats[FORMAT].startString[type];
     // check if there's an entry in the strings array
     if (addedStrings[0]) {
       builtString += formats[FORMAT].addedHeader;
