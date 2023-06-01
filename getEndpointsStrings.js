@@ -39,53 +39,45 @@ function getEndpoingsStrings(file) {
             continue;
 
           for (const property of properties) {
+            // Skip INDEX bcs it's just `/`
+            if (property.key.name === "INDEX") continue;
+
+            // Faster, just for key: value
             if (property.value.type === "Literal") {
               allStrings[property.key.name] = property.value.value;
               continue;
             }
-            if (property.value?.alternate?.type === "Literal") {
-              allStrings[property.key.name] = property.value.alternate.value;
-              continue;
-            }
 
-            for (const functionBodyEntry of property.value.body.body) {
-              if (functionBodyEntry.type !== "ReturnStatement") continue;
-              if (functionBodyEntry.argument?.type === "Literal") {
-                allStrings[property.key.name] =
-                  functionBodyEntry.argument.value;
-                continue;
-              }
-              if (functionBodyEntry.argument?.alternate?.type === "Literal") {
-                allStrings[property.key.name] =
-                  functionBodyEntry.argument.alternate.value;
-                continue;
-              }
+            const literalNodes = deepSearch(property, {
+              type: "Literal",
+            });
 
-              const literalNodes = deepSearch(functionBodyEntry, {
-                type: "Literal",
-              });
+            if (literalNodes.length > 0) {
+              const params = property.value.params ?? [];
+              let value = "";
+              let omitted = 0;
 
-              if (literalNodes.length > 0) {
-                const params = property.value.params;
-                let value = "";
-
-                for (let i = 0; i < literalNodes.length; i++) {
-                  const literal = literalNodes[i];
-                  const param = params[i];
-
-                  // TODO: fix this bcs we need everthing - there are some "null" values
-                  value += literal.value?.endsWith?.("/")
-                    ? literal.value.slice(0, -1)
-                    : literal.value;
-
-                  if (param?.type === "Identifier") value += `/{param}`;
+              for (let i = 0; i < literalNodes.length; i++) {
+                const literal = literalNodes[i];
+                if (typeof literal.value !== "string") {
+                  omitted++;
+                  continue;
                 }
 
-                value = value.replace(/[^A-Za-z0-9/\-\_\{\}]/g, "");
+                const param = params[i - omitted];
 
-                allStrings[property.key.name] = value;
-                continue;
+                // TODO: fix this bcs we need everthing - there are some "null" values
+                value += literal.value?.endsWith?.("/")
+                  ? literal.value.slice(0, -1)
+                  : literal.value;
+
+                if (param?.type === "Identifier") value += `/{param}`;
               }
+
+              value = value.replace(/[^A-Za-z0-9/\-\_\{\}\?&]/g, "");
+
+              allStrings[property.key.name] = value;
+              continue;
             }
           }
         }
