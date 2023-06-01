@@ -25,6 +25,7 @@
     "registry": "https://npm.pkg.github.com/"
   },
   "dependencies": {
-    "espree": "^9.3.2"
+    "espree": "^9.3.2",
+    "object-deep-search": "^0.0.7"
   }
 }
