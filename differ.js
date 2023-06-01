@@ -7,7 +7,7 @@
 // this file is really cursed, though it's wayyy safer than regex and eval
 // or parsing from a regex
 import getLangStrings from "./getLangStrings";
-import getLangEndpoints from "./getLangEndpoints";
+import getEndpointsStrings from "./getEndpointsStrings";
 
 // For example we grab these two files which have had lang changes between the two
 // const fs = require('fs');
@@ -57,16 +57,22 @@ let FORMAT;
  * @param {('codeblock'|'inline')} format - Which format to use when building the strings
  */
 function doWork(file1, file2, format) {
-  const langFilesStrings = [getLangStrings(file1), getLangStrings(file2)];
-  const langFilesEndpoints = [getLangEndpoints(file1), getLangEndpoints(file2)];
+  const filesLangStrings = [getLangStrings(file1), getLangStrings(file2)];
+  const filesEndpointsStrings = [
+    getEndpointsStrings(file1),
+    getEndpointsStrings(file2),
+  ];
+
   const { addedStrings, updatedStrings, removedStrings } =
-    diff(langFilesStrings);
+    diff(filesLangStrings);
   const {
     addedStrings: addedEndpoints,
     updatedStrings: updatedEndpoints,
     removedStrings: removedEndpoints,
-  } = diff(langFilesEndpoints);
+  } = diff(filesEndpointsStrings);
+
   FORMAT = format;
+
   const builtString = buildString(
     "strings",
     addedStrings,

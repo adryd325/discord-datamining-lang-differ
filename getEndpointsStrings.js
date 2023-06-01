@@ -1,9 +1,9 @@
 // HOLY SHIT I HATE THIS
 import { parse } from "espree";
-export default getLangStrings;
+export default getEndpoingsStrings;
 
 // I really really hate this, but this is much safer than regex+eval
-function getLangStrings(file) {
+function getEndpoingsStrings(file) {
   const tree = parse(file, {
     ecmaVersion: 2022,
   });
