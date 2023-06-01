@@ -65,14 +65,11 @@ function getLangStrings(file) {
     ) {
       const properties = expression.right.arguments[0].properties;
       if (
-        properties.every((suspectedLangModule) => {
-          if (
+        properties.every(
+          (suspectedLangModule) =>
             suspectedLangModule.key.type === "Identifier" &&
             suspectedLangModule.value.type === "Literal"
-          ) {
-            return true;
-          }
-        })
+        )
       ) {
         properties.forEach((langEntry) => {
           allStrings[langEntry.key.name] = langEntry.value.raw;
