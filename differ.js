@@ -6,8 +6,8 @@
 
 // this file is really cursed, though it's wayyy safer than regex and eval
 // or parsing from a regex
-const getLangStrings = require("./getLangStrings");
-const getLangEndpoints = require("./getLangEndpoints");
+import getLangStrings from "./getLangStrings";
+import getLangEndpoints from "./getLangEndpoints";
 
 // For example we grab these two files which have had lang changes between the two
 // const fs = require('fs');
@@ -152,4 +152,4 @@ function buildDiffString(diffedStrings, type) {
   return builtDiff;
 }
 
-module.exports = doWork;
+export default doWork;

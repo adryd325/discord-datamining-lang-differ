@@ -2,6 +2,7 @@
   "name": "@xhyrom-forks/discord-datamining-lang-differ",
   "version": "1.2.0",
   "description": "",
+  "type": "module",
   "main": "differ.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

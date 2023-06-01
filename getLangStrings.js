@@ -1,11 +1,11 @@
 // HOLY SHIT I HATE THIS
 
-const espree = require("espree");
-module.exports = getLangStrings;
+import { parse } from "espree";
+export default getLangStrings;
 
 // I really really hate this, but this is much safer than regex+eval
 function getLangStrings(file) {
-  const tree = espree.parse(file, {
+  const tree = parse(file, {
     ecmaVersion: 2022,
   });
 

@@ -1,9 +1,9 @@
-const getLangStrings = require("../getLangStrings.js");
-const fs = require("fs");
-const c = getLangStrings(fs.readFileSync(process.argv[2]));
+import getLangStrings from "../getLangStrings.js";
+import { readFileSync, writeFileSync } from "fs";
+const c = getLangStrings(readFileSync(process.argv[2]));
 //console.log(c);
 
-fs.writeFileSync(
+writeFileSync(
   "./test-files/test-lang-strings.json",
   JSON.stringify(c, null, 2)
 );
