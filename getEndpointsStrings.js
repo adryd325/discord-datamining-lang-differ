@@ -74,8 +74,6 @@ function getEndpoingsStrings(file) {
                 if (param?.type === "Identifier") value += `/{param}`;
               }
 
-              value = value.replace(/[^A-Za-z0-9/\-\_\{\}\?&]/g, "");
-
               allStrings[property.key.name] = value;
               continue;
             }
