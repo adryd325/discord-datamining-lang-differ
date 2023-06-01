@@ -31,7 +31,10 @@ function getLangStrings(file) {
           .properties;
       if (
         properties.some((suspectedLangModule) => {
-          if (suspectedLangModule.key.name === "DISCORD_DESC_SHORT") {
+          if (
+            suspectedLangModule.key.name === "DISCORD_DESC_SHORT" ||
+            suspectedLangModule.key.name === "DISCORD_NAME"
+          ) {
             return true;
           }
         })
@@ -62,8 +65,11 @@ function getLangStrings(file) {
     ) {
       const properties = expression.right.arguments[0].properties;
       if (
-        properties.some((suspectedLangModule) => {
-          if (suspectedLangModule.key.name === "DISCORD_NAME") {
+        properties.every((suspectedLangModule) => {
+          if (
+            suspectedLangModule.key.type === "Identifier" &&
+            suspectedLangModule.value.type === "Literal"
+          ) {
             return true;
           }
         })
