@@ -66,12 +66,11 @@ function getEndpoingsStrings(file) {
 
                 const param = params[i - omitted];
 
-                // TODO: fix this bcs we need everthing - there are some "null" values
-                value += literal.value?.endsWith?.("/")
+                value += literal.value.endsWith("/")
                   ? literal.value.slice(0, -1)
                   : literal.value;
 
-                if (param?.type === "Identifier") value += `/{param}`;
+                if (param?.type === "Identifier") value += `/:param`;
               }
 
               allStrings[property.key.name] = value;
