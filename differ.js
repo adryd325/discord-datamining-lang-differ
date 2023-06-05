@@ -121,7 +121,7 @@ function diff(strings) {
   };
 }
 
-export function buildString(
+function buildString(
   type,
   addedStrings,
   updatedStrings,
