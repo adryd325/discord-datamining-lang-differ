@@ -121,7 +121,12 @@ function diff(strings) {
   };
 }
 
-function buildString(type, addedStrings, updatedStrings, removedStrings) {
+export function buildString(
+  type,
+  addedStrings,
+  updatedStrings,
+  removedStrings
+) {
   let builtString = "";
   // if any of the following have data, we build a string
   if (addedStrings[0] || updatedStrings[0] || removedStrings[0]) {
