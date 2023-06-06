@@ -1,11 +1,11 @@
 // HOLY SHIT I HATE THIS
 
-const espree = require("espree");
-module.exports = getLangStrings;
+import { parse } from "espree";
+export default getLangStrings;
 
 // I really really hate this, but this is much safer than regex+eval
 function getLangStrings(file) {
-  const tree = espree.parse(file, {
+  const tree = parse(file, {
     ecmaVersion: 2022,
   });
 
@@ -21,36 +21,34 @@ function getLangStrings(file) {
     }
 
     if (
-     expression.right?.callee?.object?.name === "Object" &&
-     expression.right?.callee?.property?.name === "freeze" &&
-     expression.right?.arguments?.[0].expressions?.[0]?.arguments?.[0]
+      expression.right?.callee?.object?.name === "Object" &&
+      expression.right?.callee?.property?.name === "freeze" &&
+      expression.right?.arguments?.[0].expressions?.[0]?.arguments?.[0]
     ) {
       // parse frozen object
       const properties =
-        expression.right.arguments[0].expressions[0].arguments[0].right.properties;
+        expression.right.arguments[0].expressions[0].arguments[0].right
+          .properties;
       if (
-        properties.some(
-          (suspectedLangModule) => {
-            if (suspectedLangModule.key.name === "DISCORD_DESC_SHORT") {
-              return true;
-            }
+        properties.some((suspectedLangModule) => {
+          if (
+            suspectedLangModule.key.name === "DISCORD_DESC_SHORT" ||
+            suspectedLangModule.key.name === "DISCORD_NAME"
+          ) {
+            return true;
           }
-        )
+        })
       ) {
-        properties.forEach(
-          (langEntry) => {
-            allStrings[langEntry.key.name] = langEntry.value.raw;
-          }
-        );
+        properties.forEach((langEntry) => {
+          allStrings[langEntry.key.name] = langEntry.value.raw;
+        });
       }
 
       // parse function call arguments
-      expression.right.arguments[0].expressions.forEach(
-        (callExpr) => {
-          if (callExpr.arguments?.[1] && callExpr.arguments?.[2])
-            allStrings[callExpr.arguments[1].value] = callExpr.arguments[2].raw;
-        }
-      );
+      expression.right.arguments[0].expressions.forEach((callExpr) => {
+        if (callExpr.arguments?.[1] && callExpr.arguments?.[2])
+          allStrings[callExpr.arguments[1].value] = callExpr.arguments[2].raw;
+      });
     }
   }
 
@@ -61,25 +59,21 @@ function getLangStrings(file) {
     }
 
     if (
-     expression.right?.callee?.object?.name === "Object" &&
-     expression.right?.callee?.property?.name === "freeze" &&
-     expression.right?.arguments[0]?.properties
+      expression.right?.callee?.object?.name === "Object" &&
+      expression.right?.callee?.property?.name === "freeze" &&
+      expression.right?.arguments[0]?.properties
     ) {
       const properties = expression.right.arguments[0].properties;
       if (
-        properties.some(
-          (suspectedLangModule) => {
-            if (suspectedLangModule.key.name === "DISCORD_NAME") {
-              return true;
-            }
-          }
+        properties.every(
+          (suspectedLangModule) =>
+            suspectedLangModule.key.type === "Identifier" &&
+            suspectedLangModule.value.type === "Literal"
         )
       ) {
-        properties.forEach(
-          (langEntry) => {
-            allStrings[langEntry.key.name] = langEntry.value.raw;
-          }
-        );
+        properties.forEach((langEntry) => {
+          allStrings[langEntry.key.name] = langEntry.value.raw;
+        });
       }
     }
   }
