@@ -6,8 +6,9 @@
 
 // this file is really cursed, though it's wayyy safer than regex and eval
 // or parsing from a regex
-import getLangStrings from "./getLangStrings";
-import getRoutesStrings from "./getRoutesStrings";
+import getLangStrings from "./getLangStrings.js";
+import getRoutesStrings from "./getRoutesStrings.js";
+
 
 // For example we grab these two files which have had lang changes between the two
 // const fs = require('fs');
