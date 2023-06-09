@@ -31,8 +31,7 @@ function getEndpoingsStrings(file) {
           if (
             !properties?.some(
               (p) =>
-                p.key.name === "USER_RELATIONSHIPS" ||
-                p.key.name === "USER_GUILD_NOTIFICATION_SETTINGS"
+                p.key.name === "USER_RELATIONSHIPS"
             )
           )
             continue;
