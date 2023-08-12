@@ -1,6 +1,5 @@
 // HOLY SHIT I HATE THIS
 import { parse } from "espree";
-import { find as deepSearch } from "object-deep-search";
 export default getEndpoingsStrings;
 
 // I really really hate this, but this is much safer than regex+eval
@@ -32,8 +31,7 @@ function getEndpoingsStrings(file) {
           if (
             !properties?.some(
               (p) =>
-                p.key.name === "USER_RELATIONSHIPS" ||
-                p.key.name === "USER_GUILD_NOTIFICATION_SETTINGS"
+                p.key.name === "USER_RELATIONSHIPS"
             )
           )
             continue;
@@ -45,35 +43,6 @@ function getEndpoingsStrings(file) {
             // Faster, just for key: value
             if (property.value.type === "Literal") {
               allStrings[property.key.name] = property.value.value;
-              continue;
-            }
-
-            const literalNodes = deepSearch(property, {
-              type: "Literal",
-            });
-
-            if (literalNodes.length > 0) {
-              const params = property.value.params ?? [];
-              let value = "";
-              let omitted = 0;
-
-              for (let i = 0; i < literalNodes.length; i++) {
-                const literal = literalNodes[i];
-                if (typeof literal.value !== "string") {
-                  omitted++;
-                  continue;
-                }
-
-                const param = params[i - omitted];
-
-                value += literal.value.endsWith("/")
-                  ? literal.value.slice(0, -1)
-                  : literal.value;
-
-                if (param?.type === "Identifier") value += `/:param`;
-              }
-
-              allStrings[property.key.name] = value;
               continue;
             }
           }
