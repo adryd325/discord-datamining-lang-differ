@@ -12,7 +12,9 @@ export default function getLangStrings(file) {
 			// the other one has DISCORD_DESC_SHORT.
 			if(node.properties.find(x => x.key?.type === "Identifier" && (x.key.name === "DISCORD_NAME" || x.key.name === "DISCORD_DESC_SHORT"))) {
 				for(const property of node.properties) {
-					allStrings[property.key.name] = property.value.raw;
+					// String literals as keys, ex. {"a": "b"} will have `value`
+					// Normal keys, ex. {a: "b"} will have `name`
+					allStrings[property.key.value ?? property.key.name] = property.value.raw;
 				}
 			}
 		}
