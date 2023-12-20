@@ -102,7 +102,7 @@ function diff(strings) {
   const updatedStrings = [];
   const addedStrings = [];
   for (const i of Object.keys(strings[0])) {
-    if (strings[1][i]) {
+    if (strings[1][i] != undefined) {
       if (strings[0][i] !== strings[1][i]) {
         updatedStrings.push([i, strings[0][i], strings[1][i]]);
       }
@@ -111,7 +111,7 @@ function diff(strings) {
     }
   }
   for (const i of Object.keys(strings[1])) {
-    if (!strings[0][i]) {
+    if (strings[0][i] == undefined) {
       addedStrings.push([i, strings[1][i]]);
     }
   }
