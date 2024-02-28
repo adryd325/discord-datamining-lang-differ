@@ -14,7 +14,19 @@ export default function getLangStrings(file) {
 				for(const property of node.properties) {
 					// String literals as keys, ex. {"a": "b"} will have `value`
 					// Normal keys, ex. {a: "b"} will have `name`
-					allStrings[property.key.value ?? property.key.name] = property.value.raw;
+					const stringKey = property.key.value ?? property.key.name
+
+					let stringVal
+					if(property.value.type === "Literal") {
+						stringVal = property.value.raw
+					} else if(property.value.type === "TemplateLiteral") {
+						const fullString = property.value.quasis.map(x => x.value.cooked).join("") // This assumes there will be no ${} expressions
+						const rawString = JSON.stringify(fullString)
+
+						stringVal = rawString
+					}
+
+					allStrings[stringKey] = stringVal
 				}
 			}
 		}
