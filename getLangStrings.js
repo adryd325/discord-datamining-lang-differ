@@ -42,9 +42,9 @@ export default function getLangStrings(file) {
 			// Handles the `n(t, "KEY", "val")` calls
 			if(state.step === 1 && node.arguments.length === 3) {
 				const stringKey = node.arguments[1].value
-				const stringVal = node.arguments[2].value
+				const stringVal = node.arguments[2].raw
 
-				allStrings[stringKey] = JSON.stringify(stringVal)
+				allStrings[stringKey] = stringVal
 			}
 		}
 	}, undefined, {step: 0})
