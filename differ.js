@@ -7,7 +7,7 @@
 // this file is really cursed, though it's wayyy safer than regex and eval
 // or parsing from a regex
 import getLangStrings from "./getLangStrings.js";
-import getRoutesStrings from "./getRoutesStrings.js";
+import getEndpoints from "./getEndpoints.js";
 
 
 // For example we grab these two files which have had lang changes between the two
@@ -20,7 +20,7 @@ const formats = {
   codeblock: {
     startString: {
       strings: "## Strings\n```diff",
-      routes: "## Routes\n```diff",
+      endpoints: "## Endpoints\n```diff",
     },
     endString: "```",
     addedHeader: "\n# Added\n",
@@ -34,7 +34,7 @@ const formats = {
   inline: {
     startString: {
       strings: "## Strings\n```diff",
-      routes: "## Routes\n```diff",
+      endpoints: "## Endpoints\n```diff",
     },
     endString: "",
     addedHeader: "### Added\n",
@@ -59,7 +59,7 @@ let FORMAT;
  */
 function doWork(file1, file2, format) {
   const filesLangStrings = [getLangStrings(file1), getLangStrings(file2)];
-  const filesRoutesStrings = [getRoutesStrings(file1), getRoutesStrings(file2)];
+  const filesEndpoints = [getEndpoints(file1), getEndpoints(file2)];
 
   const { addedStrings, updatedStrings, removedStrings } =
     diff(filesLangStrings);
@@ -67,7 +67,7 @@ function doWork(file1, file2, format) {
     addedStrings: addedEndpoints,
     updatedStrings: updatedEndpoints,
     removedStrings: removedEndpoints,
-  } = diff(filesRoutesStrings);
+  } = diff(filesEndpoints);
 
   FORMAT = format;
 
@@ -78,7 +78,7 @@ function doWork(file1, file2, format) {
     removedStrings
   );
   const builtEndpoint = buildString(
-    "routes",
+    "endpoints",
     addedEndpoints,
     updatedEndpoints,
     removedEndpoints
